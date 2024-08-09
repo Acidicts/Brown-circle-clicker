@@ -10,6 +10,52 @@ increase = 1
 
 font = pygame.font.SysFont(None, 36)
 
+
+class MenuItem():
+    def __init__(self, x, y, text, img=None, font=None, value=0):
+        self.img = pygame.Surface((400, 100))
+        self.img.set_colorkey((0, 0, 0))
+        self.back = pygame.Surface((400, 200))
+        self.back.fill((0, 0, 100))
+        self.back.set_alpha(255)
+
+        self.img.blit(self.back, (0, 0))
+
+        self.rect = pygame.Rect(0, 0, 400, 200)
+        self.rect.topleft = (x, y)
+        self.text = text
+        self.font = font
+        self.value = value
+        self.color = (0, 0, 0)
+
+    def render_item_text(self):
+        return self.font.render(self.text, True, self.color)
+
+    def render_value_text(self):
+        return self.font.render(f"Cost: {self.value}", True, self.color)
+
+    def render(self):
+        self.img = pygame.Surface((400, 100))
+        self.img.set_colorkey((0, 0, 0))
+        self.back = pygame.Surface((400, 200))
+        self.back.fill((0, 0, 100))
+        self.back.set_alpha(255)
+
+        self.img.blit(self.back, (0, 0))
+
+    def draw(self):
+        self.render()
+        self.img.blit(self.render_item_text(), (0, 0))
+        self.img.blit(self.render_value_text(), (0, 50))
+
+        win = pygame.display.get_surface()
+        win.blit(self.img, self.rect.topleft)
+
+    def get_clicked(self, pos):
+        return self.rect.collidepoint(pos)
+
+
+
 def render_cookie():
     cookie_surf = pygame.Surface((600, 600))
     cookie_surf.fill((0, 0, 0))
@@ -23,6 +69,9 @@ def render_cookie():
 
     text = font.render(f"Score : {score}", False, (255, 255, 255))
     cookie_surf. blit(text, (600 - text.get_width(), 0))
+
+    text = font.render(f"Gain : {increase}", False, (255, 255, 255))
+    cookie_surf.blit(text, (600 - text.get_width(), text.get_height()))
 
     return cookie_surf, cookie_mask
 
@@ -40,6 +89,7 @@ def render_menu():
 
     return menu_surf, menu_back
 
+menu = [MenuItem(600, 30, "Click the cookie!", None, font, 5)]
 
 while running:
     cookie_surf, cookie_mask = render_cookie()
@@ -52,11 +102,20 @@ while running:
             offset = (mouse_pos[0] - 0, mouse_pos[1] - 0)
             if cookie_mask.overlap(pygame.mask.Mask((1, 1), fill=True), offset):
                 score += increase
+            for item in menu:
+                if item.get_clicked(mouse_pos):
+                    if item.text == "Click the cookie!":
+                        if score >= item.value:
+                            score -= item.value
+                            increase += 1
+                            item.value += item.value
 
     screen.fill((150, 200, 255))
 
     screen.blit(cookie_surf, (0, 0))
     screen.blit(menu_back, (600, 0))
     screen.blit(menu_surf, (600, 0))
+
+    menu[0].draw()
 
     pygame.display.update()
