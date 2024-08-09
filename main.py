@@ -27,11 +27,23 @@ def render_cookie():
     return cookie_surf, cookie_mask
 
 
+def render_menu():
+    menu_surf = pygame.Surface((400, 600))
+    menu_surf.set_colorkey((0, 0, 0))
 
+    menu_back = pygame.Surface((400, 600))
+    menu_back.fill((0, 0, 0))
+    menu_back.set_alpha(100)
+
+    text = font.render("Menu", True, (255, 255, 255))
+    menu_surf.blit(text, (200 - text.get_width() // 2, 0))
+
+    return menu_surf, menu_back
 
 
 while running:
     cookie_surf, cookie_mask = render_cookie()
+    menu_surf, menu_back = render_menu()
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
@@ -44,5 +56,7 @@ while running:
     screen.fill((150, 200, 255))
 
     screen.blit(cookie_surf, (0, 0))
+    screen.blit(menu_back, (600, 0))
+    screen.blit(menu_surf, (600, 0))
 
     pygame.display.update()
